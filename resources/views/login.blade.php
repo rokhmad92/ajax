@@ -11,8 +11,6 @@
 <br>
         <a href="/register">Register</a>
 <br>
-        <a href="/forgot">Lupa Password</a>
-<br>
         <button type="submit">Login!</button>
     </form>
 @endsection

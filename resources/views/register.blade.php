@@ -15,6 +15,10 @@
         <input type="password" name="password" id="password">
         <div class="fail-message"></div>
 <br>
+        <label for="cpassword">confirm password</label>
+        <input type="password" name="cpassword" id="cpassword">
+        <div class="fail-message"></div>
+<br>
         <a href="/">Login</a>
 <br>
         <input type="submit" value="Register" class="btn btn-primary" id="register_btn">

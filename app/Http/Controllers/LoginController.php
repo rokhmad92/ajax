@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 class LoginController extends Controller
 {
@@ -43,13 +44,40 @@ class LoginController extends Controller
 
     public function store(Request $request)
     {
-        $user = New User;
-        $user->email = $request->input('email');
-        $user->username = $request->input('username');
-        $user->password = bcrypt($request->input('password'));
-        $user->save();
+        $validateData = validator::make($request->input(), [
+            'email' => 'required|email|unique:users,email',
+            'username' => 'required|unique:users,username',
+            'password' => 'required|min:6|max:20',
+            'cpassword' => 'required|min:6|same:password'
+        ], [
+            'cpassword.same' => 'Confirmasi password tidak sama!',
+        ]);
 
-        return back();
+        if($validateData->fails()){
+            return response()->json([
+                'status' => 400,
+                'messages' => $validateData->getMessageBag()
+            ]);
+        } else {
+            $user = New User;
+            $user->email = $request->input('email');
+            $user->username = $request->input('username');
+            $user->password = bcrypt($request->input('password'));
+            $user->save();
+
+            return response()->json([
+                'status' => 200,
+                'messages' => 'Register Berhasil!'
+            ]);
+        }
+
+        // $user = New User;
+        // $user->email = $request->input('email');
+        // $user->username = $request->input('username');
+        // $user->password = bcrypt($request->input('password'));
+        // $user->save();
+
+        // return back();
     }
 
     public function forgotView()
@@ -57,59 +85,5 @@ class LoginController extends Controller
         return view('forgot', [
             'title' => 'Lupa sandi'
         ]);
-    }
-
-    public function sendEmail(Request $request)
-    {
-        $validateData = $request->input('email');
-
-        $token = Str::random(64);
-        DB::table('password_resets')->insert([
-            'email' => $validateData,
-            'token' => $token,
-            'created_at' => Carbon::now()
-        ]);
-        $action_link = route('show.reset.password', ['token'=>$token, 'email'=>$request->input('email')]);
-        $body = "Kami Menerima Laporan Bahwa Email " . $request->input('email') . " Lupa Kata Sandi";
-
-        Mail::send('email',['action_link'=>$action_link, 'body'=>$body], function($messege) use ($request) {
-            $messege->from('admin@abdataccounting.com', 'Abdata Accounting');
-            $messege->to($request->input('email'))
-                    ->subject('reset Password');
-        });
-
-        return back();
-    }
-
-
-    public function showResetPassword(Request $request, $token = null)
-    {
-        return view('reset')->with(['token'=>$token, 'email'=>$request->email]);
-    }
-
-    public function reset(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email|exists:users,email',
-            'password_confirmation' => 'required',
-            'password' => 'required|confirmed'
-        ]);
-
-        $check_token = DB::table('password_resets')->where([
-            'email' => $request->input('email'),
-            'token' => $request->input('token')
-        ])->first();
-
-        if(!$check_token){
-            return redirect('/');
-        } else {
-            User::where('email', $request->input('email'))->update([
-                'password' => Hash::make($request->input('password'))
-            ]);
-
-            DB::table('password_resets')->where('email', $request->input('email'))->delete();
-
-            return redirect('/');
-        }
     }
 }

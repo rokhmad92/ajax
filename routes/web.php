@@ -19,8 +19,4 @@ Route::controller(LoginController::class)->group(function() {
     Route::post('/', 'login');
     Route::get('/register', 'registerView');
     Route::post('/register', 'store');
-    Route::get('/forgot', 'forgotView');
-    Route::post('/forgot', 'sendEmail');
-    Route::get('/forgot/reset/{token}', 'showResetPassword')->name('show.reset.password');
-    Route::get('/forgot/reset', 'reset');
 });
