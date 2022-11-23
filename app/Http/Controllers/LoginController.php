@@ -67,7 +67,7 @@ class LoginController extends Controller
 
             return response()->json([
                 'status' => 200,
-                'messages' => 'Register Berhasil!'
+                'messages' => 'Registrasi berhasil, dalam 5 detik anda akan di alihkan!'
             ]);
         }
 
