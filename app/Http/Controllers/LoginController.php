@@ -2,14 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
 use App\Models\User;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class LoginController extends Controller
@@ -23,16 +18,32 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        $validateData = $request->validate([
-            'email' => 'required|email|exists:users,email',
-            'password' => 'required'
+        $validateData = validator::make($request->input(), [
+            'email' => 'required|email',
+            'password' => 'required|min:6|max:20'
         ]);
 
-        if (Auth::attempt($validateData)) {
-            return 'Berhasil Login!';
+        if($validateData->fails()){
+            return response()->json([
+                'status' => 400,
+                'messages' => $validateData->getMessageBag()
+            ]);
         } else {
-            return back();
+            if (Auth::attempt($validateData)) {
+                return response()->json([
+                    'status' => 200,
+                    'messages' => 'Login berhasil, dalam 5 detik anda akan login!'
+                ]);
+            } else {
+                return back()->with('danger', 'Email atau Password salah!');
+            }
         }
+
+        // if (Auth::attempt($validateData)) {
+        //     return 'Berhasil Login!';
+        // } else {
+        //     return back();
+        // }
     }
 
     public function registerView()

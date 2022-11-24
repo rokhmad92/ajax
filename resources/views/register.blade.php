@@ -29,7 +29,7 @@
 @endsection
 
 @section('script')
-<script src="{{ asset('js') }}/register.js"></script>
+<script src="{{ asset('js') }}/login.js"></script>
 <script>
         $(document).ready(function() {
                 $("#register_from").submit(function(e){
@@ -48,7 +48,7 @@
                                                 showError('cpassword', response.messages.cpassword);
                                                 $("#register_btn").val("Register Ulang");
                                         } else if (response.status == 200) {
-                                                $("#alert-success").html(showMessage(response.messages));
+                                                $("#alert-success").html(showMessageSuccess(response.messages));
                                                 resetValidasiClass("#register_from")
                                                 $("#register_btn").val("Berhasil Register");
                                                 setTimeout(() => {
