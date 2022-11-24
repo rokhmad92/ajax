@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class LoginController extends Controller
@@ -29,13 +30,25 @@ class LoginController extends Controller
                 'messages' => $validateData->getMessageBag()
             ]);
         } else {
-            if (Auth::attempt($validateData)) {
+            $user = User::where('email', $request->input('email'))->first();
+
+            if (!$user) {
                 return response()->json([
-                    'status' => 200,
-                    'messages' => 'Login berhasil, dalam 5 detik anda akan login!'
+                    'status' => 401,
+                    'messages' => 'Email atau Password anda salah!'
                 ]);
             } else {
-                return back()->with('danger', 'Email atau Password salah!');
+                if(Hash::check($request->input('password'), $user->password)) {
+                    return response()->json([
+                        'status' => 200,
+                        'messages' => 'Login berhasil, dalam 5 detik anda akan login!'
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => 401,
+                        'messages' => 'Email atau Password anda salah!'
+                    ]);
+                }
             }
         }
 

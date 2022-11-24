@@ -5,7 +5,7 @@
     <form method="post" id="login_form">
         @csrf
         <label for="email" class="form-label">email</label>
-        <input type="email" class="form-control" name="email" id="email">
+        <input type="text" class="form-control" name="email" id="email">
         <div class="invalid-feedback"></div>
 <br>
         <label for="password" class="form-label">password</label>
@@ -31,6 +31,7 @@
                                 data: $(this).serialize(),
                                 dataType: 'json',
                                 success: function(response) {
+                                        // console.log(response);
                                         if(response.status == 400) {
                                                 showError('email', response.messages.email);
                                                 showError('password', response.messages.password);
@@ -42,6 +43,9 @@
                                                 setTimeout(() => {
                                                         alert('login berhasil!');
                                                 }, 5000);
+                                        } else if(response.status == 401) {
+                                                $('#message').html(showMessageError(response.messages));
+                                                $("#login_btn").val('Login ulang!');
                                         } else {
                                                 alert('Request Error!');
                                         }
