@@ -3,19 +3,44 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Dflydev\DotAccessData\Data;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\Facades\DataTables;
 
 class LoginController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $user = User::all();
+        if ($request->ajax()) {
+            return DataTables::of(User::query())
+            ->addIndexColumn()
+            ->addColumn('aksi', function($model) {
+                $btn = '<a href="'. route('edit', ['id' => $model->id]) .'" type="button" target="_blank" class="btn btn-primary">
+                Edit Data
+                </a>';
+                return $btn;
+            })
+            ->rawColumns(['aksi'])
+            ->toJson();
+        }
+
         return view('login', [
             'title' => 'Login'
-        ], compact('user'));
+        ]);
+    }
+
+    public function data()
+    {
+        return DataTables::of(User::query())->addIndexColumn()->toJson();
+    }
+
+    public function edit($id)
+    {
+        $user = User::find($id);
+        return @dd($user);
     }
 
     public function login(Request $request)

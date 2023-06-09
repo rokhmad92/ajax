@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::controller(LoginController::class)->group(function() {
     Route::get('/', 'index')->name('data');
+    Route::get('/data', 'data')->name('url_data');
+    Route::get('/edit/{id}', 'edit')->name('edit');
     Route::post('/', 'login');
     Route::get('/register', 'registerView');
     Route::post('/register', 'store');
