@@ -16,9 +16,13 @@
 <br>
         <input type="submit" class="btn btn-primary" id="login_btn" value="Login"></input>
     </form>
+
+    <br><br>
+
+    @include('table')
 @endsection
 
-@section('script')
+@push('script')
 <script src="{{ asset('js') }}/login.js"></script>
 <script>
         $(document).ready( function() {
@@ -54,4 +58,4 @@
                 });
         });
 </script>
-@endsection
+@endpush

@@ -12,9 +12,10 @@ class LoginController extends Controller
 {
     public function index()
     {
+        $user = User::all();
         return view('login', [
             'title' => 'Login'
-        ]);
+        ], compact('user'));
     }
 
     public function login(Request $request)

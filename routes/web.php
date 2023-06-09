@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::controller(LoginController::class)->group(function() {
-    Route::get('/', 'index');
+    Route::get('/', 'index')->name('data');
     Route::post('/', 'login');
     Route::get('/register', 'registerView');
     Route::post('/register', 'store');
