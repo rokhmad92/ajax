@@ -3,19 +3,35 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Dflydev\DotAccessData\Data;
 use Illuminate\Http\Request;
+use Dflydev\DotAccessData\Data;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\QueryDataTable;
 
 class LoginController extends Controller
 {
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            return DataTables::of(User::query())
+            // dropdown sorting
+                $gender = $request->input('gender');
+                $kartu = $request->input('kartu');
+                if ($gender !== null && $kartu !== null) {
+                    $query = DB::table('users')->where('gender', $gender)->where('kartu', $kartu);
+                } elseif ($gender !== null ) {
+                    $query = DB::table('users')->where('gender', $gender);
+                } elseif ($kartu !== null ) {
+                    $query = DB::table('users')->where('kartu', $kartu);
+                } else {
+                    $query = DB::table('users');
+                }
+            // END dropdown sorting
+
+            return DataTables::queryBuilder($query)
             ->addIndexColumn()
             ->addColumn('aksi', function($model) {
                 $btn = '<a href="'. route('edit', ['id' => $model->id]) .'" type="button" target="_blank" class="btn btn-primary">
@@ -32,10 +48,34 @@ class LoginController extends Controller
         ]);
     }
 
-    public function data()
-    {
-        return DataTables::of(User::query())->addIndexColumn()->toJson();
-    }
+    // public function data()
+    // {
+    //     return DataTables::of(User::query())
+    //         ->addIndexColumn()
+    //         ->addColumn('aksi', function($model) {
+    //             $btn = '<a href="'. route('edit', ['id' => $model->id]) .'" type="button" target="_blank" class="btn btn-primary">
+    //             Edit Data
+    //             </a>';
+    //             return $btn;
+    //         })
+    //         ->rawColumns(['aksi'])
+    //         ->toJson();
+    // }
+
+    // public function filter()
+    // {
+    //     $query = User::where();
+    //     return DataTables::of($query)
+    //         ->addIndexColumn()
+    //         ->addColumn('aksi', function($model) {
+    //             $btn = '<a href="'. route('edit', ['id' => $model->id]) .'" type="button" target="_blank" class="btn btn-primary">
+    //             Edit Data
+    //             </a>';
+    //             return $btn;
+    //         })
+    //         ->rawColumns(['aksi'])
+    //         ->toJson();
+    // }
 
     public function edit($id)
     {
